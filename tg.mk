@@ -18,10 +18,17 @@ $(call inherit-product, device/bn/encore/full_encore.mk)
 
 PRODUCT_RELEASE_NAME := NookColor
 
-# Inherit some common CM stuff.
-$(call inherit-product, vendor/Gummy/config/common_full_tablet_wifionly.mk)
+# We need screen width/height defined before inheriting
+# common_full_tablet_wifionly.mk to avoid automatically bringing in the wrong
+# boot animation.
+TARGET_SCREEN_HEIGHT := 1024
+TARGET_SCREEN_WIDTH := 600
+TARGET_BOOTANIMATION_HALF_RES := true
 
-PRODUCT_BUILD_PROP_OVERRIDES += PRODUCT_NAME=encore BUILD_ID=JSS15Q BUILD_DISPLAY_ID=JSS15Q BUILD_FINGERPRINT="bn/bn_encore/encore:4.3/JSS15Q/779366:user/release-keys" PRIVATE_BUILD_DESC="encore-user 4.3 JSS15Q 779366 release-keys"
+# Inherit some common CM stuff.
+$(call inherit-product, vendor/Gummy/config/common_mini_tablet_wifionly.mk)
+
+PRODUCT_BUILD_PROP_OVERRIDES += PRODUCT_NAME=encore BUILD_FINGERPRINT="bn/bn_encore/encore:4.4.2/KOT49H/937116:user/release-keys" PRIVATE_BUILD_DESC="encore-user 4.4.2 KOT49H 937116 release-keys"
 
 PRODUCT_NAME := tg_encore
 PRODUCT_DEVICE := encore

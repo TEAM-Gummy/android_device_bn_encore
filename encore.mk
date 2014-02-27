@@ -40,12 +40,20 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/etc/powervr.ini:system/etc/powervr.ini
 
 # Wifi firmware (modules are built from source)
+#PRODUCT_COPY_FILES += \
+#    device/bn/encore/firmware/ti-connectivity/LICENSE:system/etc/firmware/ti-connectivity/LICENSE \
+#    device/bn/encore/firmware/ti-connectivity/wl127x-fw-4-mr.bin:system/etc/firmware/ti-connectivity/wl127x-fw-4-mr.bin \
+#    device/bn/encore/firmware/ti-connectivity/wl127x-fw-4-plt.bin:system/etc/firmware/ti-connectivity/wl127x-fw-4-plt.bin \
+#    device/bn/encore/firmware/ti-connectivity/wl127x-fw-4-sr.bin:system/etc/firmware/ti-connectivity/wl127x-fw-4-sr.bin \
+#    device/bn/encore/firmware/ti-connectivity/wl1271-nvs_127x.bin:system/etc/firmware/ti-connectivity/wl1271-nvs_127x.bin
 PRODUCT_COPY_FILES += \
-    device/bn/encore/firmware/ti-connectivity/LICENSE:system/etc/firmware/ti-connectivity/LICENSE \
-    device/bn/encore/firmware/ti-connectivity/wl127x-fw-4-mr.bin:system/etc/firmware/ti-connectivity/wl127x-fw-4-mr.bin \
-    device/bn/encore/firmware/ti-connectivity/wl127x-fw-4-plt.bin:system/etc/firmware/ti-connectivity/wl127x-fw-4-plt.bin \
-    device/bn/encore/firmware/ti-connectivity/wl127x-fw-4-sr.bin:system/etc/firmware/ti-connectivity/wl127x-fw-4-sr.bin \
-    device/bn/encore/firmware/ti-connectivity/wl1271-nvs_127x.bin:system/etc/firmware/ti-connectivity/wl1271-nvs_127x.bin
+    hardware/ti/wlan/mac80211/firmware/127x/LICENCE:system/etc/firmware/ti-connectivity/LICENCE
+
+PRODUCT_PACKAGES += \
+    wl127x-fw-4-sr.bin \
+    wl127x-fw-4-mr.bin \
+    wl127x-fw-4-plt.bin \
+    wl1271-nvs_127x.bin
 
 # Script to edit the shipped nvs file to insert the device's assigned MAC
 # address
@@ -55,17 +63,15 @@ PRODUCT_PACKAGES += store-mac-addr.sh
 PRODUCT_COPY_FILES += \
     device/bn/encore/firmware/TIInit_7.2.31.bts:/system/etc/firmware/TIInit_7.2.31.bts
 
-# Place permission files
+# Hardware capabilities
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
-    frameworks/native/data/etc/android.hardware.camera.autofocus.xml:system/etc/permissions/android.hardware.camera.autofocus.xml \
-    frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
+    $(LOCAL_PATH)/etc/permissions/core_hardware.xml:system/etc/permissions/core_hardware.xml \
+    frameworks/native/data/etc/android.hardware.location.xml:system/etc/permissions/android.hardware.location.xml \
     frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
-    frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
-    frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
+    frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.distinct.xml:system/etc/permissions/android.hardware.touchscreen.multitouch.distinct.xml \
-    frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
     frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
+    frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml
 
@@ -76,7 +82,7 @@ PRODUCT_COPY_FILES += \
 
 # Clears the boot counter
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/clear_bootcnt.sh:/system/bin/clear_bootcnt.sh
+    $(LOCAL_PATH)/prebuilt/bin/clear_bootcnt.sh:/system/bin/clear_bootcnt.sh
 
 # Audio Files - Need to fix Source - THANKS STEVEN676 (SLUO in irc)
 PRODUCT_COPY_FILES += \
@@ -124,7 +130,7 @@ PRODUCT_COPY_FILES += \
 
 # update the battery log info
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/log_battery_data.sh:/system/bin/log_battery_data.sh
+    $(LOCAL_PATH)/prebuilt/bin/log_battery_data.sh:/system/bin/log_battery_data.sh
 
 ifeq ($(TARGET_PREBUILT_BOOTLOADER),)
     LOCAL_BOOTLOADER := device/bn/encore/prebuilt/boot/MLO
@@ -154,7 +160,7 @@ PRODUCT_COPY_FILES += \
 
 # Product specfic packages
 PRODUCT_PACKAGES += \
-    overlay.omap3 \
+    hwcomposer.omap3 \
     lights.encore \
     sensors.encore \
     power.encore \
@@ -164,9 +170,6 @@ PRODUCT_PACKAGES += \
     audio.a2dp.default \
     libaudiohw_legacy \
     audio.primary.encore \
-    tinyplay \
-    tinymix \
-    tinycap \
     acoustics.default \
     com.android.future.usb.accessory \
     dhcpcd.conf \
@@ -213,12 +216,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
         libskiahw
 
-# Support for Browser's saved page feature. This allows
-# for pages saved on previous versions of the OS to be
-# viewed on the current OS.
-PRODUCT_PACKAGES += \
-	libskia_legacy
-
 # from omap3.mk.
 
 PRODUCT_PACKAGES += \
@@ -242,10 +239,8 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 
 # Set property overrides
 PRODUCT_PROPERTY_OVERRIDES += \
-    wifi.interface=wlan0 \
-    dalvik.vm.heapsize=128m \
-    ro.opengles.version=131072
+    dalvik.vm.heapsize=128m
 
-$(call inherit-product, vendor/bn/encore/encore-vendor.mk)
+$(call inherit-product-if-exists, vendor/bn/encore/encore-vendor.mk)
 #$(call inherit-product-if-exists, hardware/ti/wpan/ti-wpan-products.mk)
 #$(call inherit-product-if-exists, device/ti/proprietary-open/wl12xx/wlan/wl12xx-wlan-fw-products.mk)
