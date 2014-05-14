@@ -37,9 +37,16 @@ on init
     # for encore
     mkdir /rom 0755 root root
 
+    # disable swap page clustering -- helpful on disk, not with zram
+    write /proc/sys/vm/page-cluster 0
+
+    # reduce swappiness for foreground processes
+    write /proc/sys/vm/swappiness 20
+
 on fs
     # mount partitions
     mount_all /fstab.encore
+    swapon_all /fstab.encore
 
 on post-fs-data
     # we will remap this as /mnt/sdcard with the sdcard fuse tool
@@ -198,6 +205,11 @@ on boot
 on property:dev.bootcomplete=1
     start bootcnt
     class_start default
+
+    # Enable KSM to merge duplicate memory pages
+    write /sys/kernel/mm/ksm/pages_to_scan 100
+    write /sys/kernel/mm/ksm/sleep_millisecs 500
+    write /sys/kernel/mm/ksm/run 1
 
 #service mountd /system/bin/mountd
 #   socket mountd stream 0660 root mount
